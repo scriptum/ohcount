@@ -5,6 +5,8 @@
 #define OHCOUNT_STRUCTS_H
 
 #include <pcre.h>
+#define __STDC_FORMAT_MACROS
+#include <inttypes.h>
 
 /**
  * @struct License
@@ -79,6 +81,7 @@ typedef struct {
 
   /** The number of lines of code for this Loc. */
   int code;
+  uint64_t code_size;
 
   /** The number of lines of comments for this Loc. */
   int comments;
@@ -143,6 +146,7 @@ typedef struct {
 
   /** The number of blank lines removed in this LocDelta. */
   int blanks_removed;
+  uint64_t size;
 
 } LocDelta;
 
@@ -203,6 +207,7 @@ typedef struct {
 
   /** Number of blank lines for this language. */
   int blanks_count;
+  int code_size;
 
 } ParsedLanguage;
 

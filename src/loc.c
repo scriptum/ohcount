@@ -8,11 +8,12 @@
 
 // Loc
 
-Loc *ohcount_loc_new(const char *language, int code, int comments, int blanks,
+Loc *ohcount_loc_new(const char *language, int code, uint64_t size, int comments, int blanks,
                      int filecount) {
   Loc *loc = malloc(sizeof(Loc));
   loc->language = language;
   loc->code = code;
+  loc->code_size = size;
   loc->comments = comments;
   loc->blanks = blanks;
   loc->filecount = filecount;
@@ -26,6 +27,7 @@ int ohcount_loc_total(Loc *loc) {
 void ohcount_loc_add_loc(Loc *loc, Loc *other) {
   if (strcmp(loc->language, other->language) == 0) {
     loc->code += other->code;
+    loc->code_size += other->code_size;
     loc->comments += other->comments;
     loc->blanks += other->blanks;
     loc->filecount += other->filecount;
@@ -57,7 +59,7 @@ void ohcount_loc_list_add_loc(LocList *list, Loc *loc) {
   if (list->head == NULL) { // empty list
     list->head = list;
     list->tail = list;
-    list->head->loc = ohcount_loc_new(loc->language, loc->code, loc->comments,
+    list->head->loc = ohcount_loc_new(loc->language, loc->code, loc->code_size, loc->comments,
                                       loc->blanks, loc->filecount);
     list->head->next = NULL;
   } else {
@@ -68,7 +70,7 @@ void ohcount_loc_list_add_loc(LocList *list, Loc *loc) {
     }
     if (iter == NULL) { // new language
       LocList *item = ohcount_loc_list_new();
-      item->loc = ohcount_loc_new(loc->language, loc->code, loc->comments,
+      item->loc = ohcount_loc_new(loc->language, loc->code, loc->code_size, loc->comments,
                                   loc->blanks, loc->filecount);
       list->tail->next = item;
       list->tail = item;
@@ -98,6 +100,16 @@ int ohcount_loc_list_code(LocList *list) {
   LocList *iter = list->head;
   while (iter) {
     sum += iter->loc->code;
+    iter = iter->next;
+  }
+  return sum;
+}
+
+uint64_t ohcount_loc_list_code_size(LocList *list) {
+  uint64_t sum = 0;
+  LocList *iter = list->head;
+  while (iter) {
+    sum += iter->loc->code_size;
     iter = iter->next;
   }
   return sum;
@@ -171,7 +183,8 @@ void ohcount_loc_list_free(LocList *list) {
 LocDelta *ohcount_loc_delta_new(const char *language, int code_added,
                                 int code_removed, int comments_added,
                                 int comments_removed, int blanks_added,
-                                int blanks_removed) {
+                                int blanks_removed,
+                                uint64_t size) {
   LocDelta *delta = malloc(sizeof(LocDelta));
   delta->language = language;
   delta->code_added = code_added;
@@ -180,6 +193,7 @@ LocDelta *ohcount_loc_delta_new(const char *language, int code_added,
   delta->comments_removed = comments_removed;
   delta->blanks_added = blanks_added;
   delta->blanks_removed = blanks_removed;
+  delta->size = size;
   return delta;
 }
 
@@ -209,6 +223,7 @@ void ohcount_loc_delta_add_loc_delta(LocDelta *delta, LocDelta *other) {
     delta->comments_removed += other->comments_removed;
     delta->blanks_added += other->blanks_added;
     delta->blanks_removed += other->blanks_removed;
+    delta->size += other->size;
   }
 }
 
@@ -253,7 +268,8 @@ void ohcount_loc_delta_list_add_loc_delta(LocDeltaList *list, LocDelta *delta) {
                                               delta->comments_added,
                                               delta->comments_removed,
                                               delta->blanks_added,
-                                              delta->blanks_removed);
+                                              delta->blanks_removed,
+                                              delta->size);
     list->head->next = NULL;
   } else {
     LocDeltaList *iter = list->head;
@@ -269,7 +285,8 @@ void ohcount_loc_delta_list_add_loc_delta(LocDeltaList *list, LocDelta *delta) {
                                           delta->comments_added,
                                           delta->comments_removed,
                                           delta->blanks_added,
-                                          delta->blanks_removed);
+                                          delta->blanks_removed,
+                                          delta->size);
       list->tail->next = item;
       list->tail = item;
     } else ohcount_loc_delta_add_loc_delta(iter->delta, delta); // existing

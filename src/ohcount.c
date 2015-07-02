@@ -186,7 +186,7 @@ void sort_loc_list_by_code(LocList *list) {
     LocList *max = iter;
     LocList *iter2 = iter->next;
     while (iter2) {
-      if (iter2->loc->code > max->loc->code)
+      if (iter2->loc->code_size > max->loc->code_size)
         max = iter2;
       iter2 = iter2->next;
     }
@@ -213,8 +213,8 @@ void summary(SourceFileList *list) {
     "\n"
     "                          Ohloh Line Count Summary                          \n"
     "\n"
-    "Language          Files       Code    Comment  Comment %%      Blank      Total\n"
-    "----------------  -----  ---------  ---------  ---------  ---------  ---------\n");
+    "Language          Files       Code    Comment  Comment %%      Blank      Size\n"
+    "----------------  -----  ---------  ---------  ---------  ---------  -----------\n");
   LocList *iter = loc_list->head;
   while (iter) {
     printf("%-16s", iter->loc->language);
@@ -228,15 +228,16 @@ void summary(SourceFileList *list) {
     else
       printf("       0.0%%");
     printf(" %10d", iter->loc->blanks);
-    printf(" %10d\n",
-           iter->loc->code + iter->loc->comments + iter->loc->blanks);
+    printf(" %12" PRIu64 "\n",
+           iter->loc->code_size);
     iter = iter->next;
   }
-  printf("----------------  -----  ---------  ---------  ---------  ---------  ---------\n");
+  printf("----------------  -----  ---------  ---------  ---------  ---------  -----------\n");
   int code = ohcount_loc_list_code(loc_list);
+  uint64_t code_size = ohcount_loc_list_code_size(loc_list);
   int comments = ohcount_loc_list_comments(loc_list);
   int blanks = ohcount_loc_list_blanks(loc_list);
-  printf("%-16s", "Total");
+  printf("%-16s", "Size");
   printf(" %6d", ohcount_loc_list_filecount(loc_list));
   printf(" %10d", code);
   printf(" %10d", comments);
@@ -245,7 +246,7 @@ void summary(SourceFileList *list) {
   else
     printf("       0.0%%");
   printf(" %10d", blanks);
-  printf(" %10d\n", code + comments + blanks);
+  printf(" %12" PRIu64 "\n", code_size);
   ohcount_loc_list_free(loc_list);
 }
 

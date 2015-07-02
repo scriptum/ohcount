@@ -18,7 +18,7 @@
  * @param filecount The number of files counted for this set.
  * @return Loc
  */
-Loc *ohcount_loc_new(const char *language, int code, int comments, int blanks,
+Loc *ohcount_loc_new(const char *language, int code, uint64_t size, int comments, int blanks,
                      int filecount);
 
 /**
@@ -87,6 +87,7 @@ Loc *ohcount_loc_list_get_loc(LocList *list, const char *language);
  * @param list A LocList created from ohcount_loc_list_new().
  */
 int ohcount_loc_list_code(LocList *list);
+uint64_t ohcount_loc_list_code_size(LocList *list);
 
 /**
  * Returns the number of lines of commentsfor all Locs in this LocList.
@@ -144,7 +145,7 @@ void ohcount_loc_list_free(LocList *list);
 LocDelta *ohcount_loc_delta_new(const char *language, int code_added,
                                 int code_removed, int comments_added,
                                 int comments_removed, int blanks_added,
-                                int blanks_removed);
+                                int blanks_removed, uint64_t size);
 
 /**
  * Returns the net number of lines of code in a given LocDelta.

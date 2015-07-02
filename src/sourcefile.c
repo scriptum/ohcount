@@ -241,6 +241,7 @@ LocList *ohcount_sourcefile_get_loc_list(SourceFile *sourcefile) {
     iter = ohcount_sourcefile_get_parsed_language_list(sourcefile)->head;
     while (iter) {
       Loc *loc = ohcount_loc_new(iter->pl->name, iter->pl->code_count,
+                                 iter->pl->code_size,
                                  iter->pl->comments_count,
                                  iter->pl->blanks_count, 1);
       ohcount_loc_list_add_loc(list, loc);
@@ -288,7 +289,7 @@ LocDeltaList *ohcount_sourcefile_diff(SourceFile *from, SourceFile *to) {
 LocDelta *ohcount_sourcefile_calc_loc_delta(SourceFile *from_file,
                                             const char *language,
                                             SourceFile *to_file) {
-  LocDelta *delta = ohcount_loc_delta_new(language, 0, 0, 0, 0, 0, 0);
+  LocDelta *delta = ohcount_loc_delta_new(language, 0, 0, 0, 0, 0, 0, 0);
 	ParsedLanguage * const blank = ohcount_parsed_language_new(language, 0);
 	ParsedLanguage *from = blank, *to = blank;
 

@@ -15,6 +15,7 @@ ParsedLanguage *ohcount_parsed_language_new(const char *name,
   pl->code_p = pl->code;
   *pl->code_p = '\0';
   pl->code_count = 0;
+  pl->code_size = (uint64_t)0;
   pl->comments = malloc(buffer_size + 5);
   pl->comments_p = pl->comments;
   *pl->comments_p = '\0';
@@ -31,6 +32,7 @@ void ohcount_parsed_language_add_code(ParsedLanguage *parsed_language,
     parsed_language->code_p += length;
     *parsed_language->code_p = '\0';
     parsed_language->code_count++;
+    parsed_language->code_size += length - 1;
   }
 }
 
